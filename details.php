@@ -8,7 +8,7 @@
  */
 class Module_Journal extends Module
 {
-	public $version = '0.0.13';
+	public $version = '0.0.14';
 
 	public function info()
 	{
@@ -159,7 +159,7 @@ public function install()
 
 		$this->load->library('files/files');
 		$folder = Files::create_folder(0, $folder_name);
-		$folder_id = $folder['id'];
+		$folder_id =  $folder['data']['id'];
 
 	}
 
@@ -253,7 +253,7 @@ public function uninstall()
 
 public function upgrade($old_version)
 {
-	
+	return true;
 	/*$fields = array(
 		'parsed' => array(
 			'name' => 'parsed_body',
