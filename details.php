@@ -8,7 +8,7 @@
  */
 class Module_Journal extends Module
 {
-	public $version = '0.0.14';
+	public $version = '0.0.15';
 
 	public function info()
 	{
@@ -253,16 +253,7 @@ public function uninstall()
 
 public function upgrade($old_version)
 {
-	return true;
-	/*$fields = array(
-		'parsed' => array(
-			'name' => 'parsed_body',
-			'type' => 'TEXT',
-			),
 
-		);
-	$this->dbforge->modify_column('journal', $fields);
-*/
 	
 	 $fields = array(
 	 	'itemscope' => array('type' => 'ENUM', 'constraint' => array('Article','NewsArticle','TechArticle','ScholarlyArticle', 'BlogPosting'), 'default' => 'Article'),		);
