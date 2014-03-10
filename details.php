@@ -8,7 +8,7 @@
  */
 class Module_Journal extends Module
 {
-	public $version = '0.0.15';
+	public $version = '0.0.16';
 
 	public function info()
 	{
@@ -255,10 +255,14 @@ public function upgrade($old_version)
 {
 
 	
-	 $fields = array(
-	 	'itemscope' => array('type' => 'ENUM', 'constraint' => array('Article','NewsArticle','TechArticle','ScholarlyArticle', 'BlogPosting'), 'default' => 'Article'),		);
-	
-	 $this->dbforge->add_column('journal_categories', $fields);
+	if (!$this->db->field_exists('itemscope', 'journal_categories'))
+	{
+   // some code...
+		$fields = array(
+			'itemscope' => array('type' => 'ENUM', 'constraint' => array('Article','NewsArticle','TechArticle','ScholarlyArticle', 'BlogPosting'), 'default' => 'Article'),		);
+
+		$this->dbforge->add_column('journal_categories', $fields);
+	}
 
 	return true;
 }

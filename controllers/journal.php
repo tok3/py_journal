@@ -466,20 +466,87 @@ $this->template
 				));
 		}
 
+	  // start of MySEO modification
+
+        // i reccommend you touche only the mod part, not overwrite the file!
+
+        // file location: system/cms/modules/blog/controllers/blog.php
+
+        // method _single_view()
+
+        // comment out templete view building and replace with everything below it
+
+        // tested with pyrocms 2.2.1
+
+        /*
 		$this->template
-		->title($post['title'], lang('journal:journal_title'))
-		->set_metadata('og:type', 'article', 'og')
-		->set_metadata('og:url', current_url(), 'og')
-		->set_metadata('og:title', $post['title'], 'og')
-		->set_metadata('og:site_name', Settings::get('site_name'), 'og')
-		->set_metadata('og:description', $post['preview'], 'og')
-		->set_metadata('article:published_time', date(DATE_ISO8601, $post['created_on']), 'og')
-		->set_metadata('article:modified_time', date(DATE_ISO8601, $post['updated_on']), 'og')
-		->set_metadata('description', $post['preview'])
-		->set_metadata('keywords', implode(', ', $post['keywords_arr']))
-		->set_breadcrumb($post['title'])
-		->set_stream($this->stream->stream_slug, $this->stream->stream_namespace)
-		->set('post', array($post))
-		->build('view');
+			->title($post['title'], lang('journal:blog_title'))
+			->set_metadata('og:type', 'article', 'og')
+			->set_metadata('og:url', current_url(), 'og')
+			->set_metadata('og:title', $post['title'], 'og')
+			->set_metadata('og:site_name', Settings::get('site_name'), 'og')
+			->set_metadata('og:description', $post['preview'], 'og')
+			->set_metadata('article:published_time', date(DATE_ISO8601, $post['created_on']), 'og')
+			->set_metadata('article:modified_time', date(DATE_ISO8601, $post['updated_on']), 'og')
+			->set_metadata('description', $post['preview'])
+			->set_metadata('keywords', implode(', ', $post['keywords_arr']))
+			->set_breadcrumb($post['title'])
+			->set_stream($this->stream->stream_slug, $this->stream->stream_namespace)
+			->set('post', array($post))
+			->build('view');
+        */
+
+        $myseo_meta = $this->db->where('post_id', $post['id'])->get('myseo_articles_meta')->row();
+
+        // case no meta was found
+        if (empty($myseo_meta))
+        {
+            $myseo_meta = new stdClass();
+
+            $myseo_meta->title = '';
+            $myseo_meta->description = '';
+            $myseo_meta->keywords = '';
+            $myseo_meta->no_index = '';
+            $myseo_meta->no_follow = '';
+        }
+
+        // get actual keywords
+        $myseo_meta->keywords = Keywords::get_string($myseo_meta->keywords);
+
+        if ($myseo_meta->title)
+        {
+            $this->template->title($myseo_meta->title);
+        }
+        else
+        {
+            $this->template->title($post['title'], lang('journal:blog_title'));
+        }
+
+        $description = ($myseo_meta->description) ? $myseo_meta->description : $post['preview'];
+
+        $keywords = ($myseo_meta->keywords) ? $myseo_meta->keywords : implode(', ', $post['keywords_arr']);
+
+        $robots = array(
+            'index' => ($myseo_meta->no_index) ? 'noindex' : 'index',
+            'follow' => ($myseo_meta->no_follow) ? 'nofollow' : 'follow'
+        );
+
+        $robots = implode(',', $robots);
+
+        $this->template
+            ->set_metadata('og:type', 'article', 'og')
+            ->set_metadata('og:url', current_url(), 'og')
+            ->set_metadata('og:title', $post['title'], 'og')
+            ->set_metadata('og:site_name', Settings::get('site_name'), 'og')
+            ->set_metadata('og:description', $post['preview'], 'og')
+            ->set_metadata('article:published_time', date(DATE_ISO8601, $post['created_on']), 'og')
+            ->set_metadata('article:modified_time', date(DATE_ISO8601, $post['updated_on']), 'og')
+            ->set_metadata('description', $description)
+            ->set_metadata('keywords', $keywords)
+            ->set_metadata('robots', $robots)
+            ->set_breadcrumb($post['title'])
+            ->set_stream($this->stream->stream_slug, $this->stream->stream_namespace)
+            ->set('post', array($post))
+            ->build('view');
 	}
 }
