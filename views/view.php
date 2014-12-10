@@ -75,7 +75,7 @@
 	<?php else: ?>
 	<?php echo sprintf(lang('journal:disabled_after'), strtolower(lang('global:duration:'.str_replace(' ', '-', $post[0]['comments_enabled'])))) ?>
 <?php endif ?>
-
+		</div> <!-- kommentar fix -->
 <?php endif ?>
 
 
